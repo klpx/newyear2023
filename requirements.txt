@@ -1,0 +1,3 @@
+openai
+flask
+Flask-reCaptcha==0.4.2
