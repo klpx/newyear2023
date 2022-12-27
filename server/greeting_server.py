@@ -47,7 +47,7 @@ def validate_form(form: dict[str, str]) -> CongratRequest:
 # start webserver to handle requests
 def main():
     app = Flask(__name__)
-    cors = CORS(app)
+    cors = CORS(app, resources={r"*": {"origins": "*"}})
     app.config['RECAPTCHA_SITE_KEY'] = RECAPTCHA_SITE_KEY
     app.config['RECAPTCHA_SECRET_KEY'] = RECAPTCHA_SECRET_KEY
     recaptcha = ReCaptcha(app)
