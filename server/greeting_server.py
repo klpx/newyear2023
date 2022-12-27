@@ -3,6 +3,7 @@ import re
 
 import openai
 from flask import Flask, request
+from flask_cors import CORS, cross_origin
 from flask_recaptcha import ReCaptcha
 
 DISABLE_RECAPTCHA = os.environ.get('DISABLE_RECAPTCHA', False)
@@ -29,47 +30,39 @@ def get_completion(prompt: str):
 
 class CongratRequest:
     prompt: str
-    email: str
 
-    def __init__(self, prompt: str, email: str):
+    def __init__(self, prompt: str):
         self.prompt = prompt
-        self.email = email
 
 
 def validate_form(form: dict[str, str]) -> CongratRequest:
     prompt = form.get('prompt')
-    email = form.get('email')
-    # validate email with simple regexp
-    if not email or not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-        raise ValueError("invalid_email")
     if not prompt:
         raise ValueError("invalid_prompt")
     if len(prompt) < 10:
         raise ValueError("prompt_too_short")
-    return CongratRequest(prompt=prompt, email=email)
+    return CongratRequest(prompt=prompt)
 
 
 # start webserver to handle requests
 def main():
     app = Flask(__name__)
+    cors = CORS(app)
     app.config['RECAPTCHA_SITE_KEY'] = RECAPTCHA_SITE_KEY
     app.config['RECAPTCHA_SECRET_KEY'] = RECAPTCHA_SECRET_KEY
     recaptcha = ReCaptcha(app)
 
-    @app.route('/recaptcha-key', methods=['GET'])
-    def recaptcha_key():
-        return recaptcha.get_code()
-
     @app.route('/submit-congrat', methods=['POST'])
+    @cross_origin()
     def greeting():
         if 'test' in request.form and request.form['test'] == 'test':
             return "ok", 200
         if not (DISABLE_RECAPTCHA or recaptcha.verify()):
-            return "Recaptcha verification failed", 400
+            return {'error': 'recaptcha_failed'}, 400
         try:
             valid_req = validate_form(request.form)
         except ValueError as e:
-            return str(e), 400
+            return {'error': str(e)}, 400
 
         response = get_completion(valid_req.prompt)
         return response['choices']
@@ -77,7 +70,7 @@ def main():
     app.run(host='0.0.0.0', port=5000)
 
 # CURL command to test the server:
-# curl -X POST -F 'prompt=С Новым Годом!' -F 'email=alex@arigativa.ru' http://localhost:5000/submit-congrat
+# curl -X POST -F 'prompt=С Новым Годом!' http://localhost:5000/submit-congrat
 
 
 if __name__ == "__main__":
