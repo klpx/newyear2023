@@ -2,7 +2,7 @@ import json
 
 EXAMPLES_FILE = './data/tuning.prompts.csv'
 EXAMPLES_PREPARED = './data/train.jsonl'
-START = "Дополни это поздравление с новым годом черным позитивным юмором: "
+START = "Дополни это поздравление с новым годом неожиданным прикольным добрым и позитивным образом: "
 DELIMITER = "\nДополнение:"
 STOP = "\n###\n"
 
@@ -16,7 +16,7 @@ def prepare_examples():
                 line = line.strip()
                 if not line:
                     continue
-                prompt, completion = line.split(';')
+                prompt, completion = line.split("\t")
                 g.write(json.dumps({'prompt': START + prompt + DELIMITER, 'completion': ' ' + completion + STOP}))
                 g.write("\n")
 
