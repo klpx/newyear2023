@@ -9,7 +9,7 @@ from flask import send_file
 from flask_cors import CORS, cross_origin
 
 LOGS_SECRET = os.environ.get('LOGS_SECRET', 'anotherone')
-TUNED_MODEL_ID = os.environ.get('TUNED_MODEL_ID', 'davinci:ft-personal-2022-12-28-20-27-55')
+TUNED_MODEL_ID = os.environ.get('TUNED_MODEL_ID', 'davinci:ft-personal-2022-12-29-11-47-17')
 QUERY_LOG_PATH = os.environ.get('QUERY_LOG_PATH', '/tmp/newyear.queries.jsonl')
 
 START = "Дополни это поздравление с новым годом неожиданным прикольным добрым и позитивным образом: "
@@ -62,7 +62,12 @@ def main(query_log_fh):
 
         try:
             response = get_completion(valid_req.prompt)
-            query_log_fh.write(json.dumps({'timestamp': datetime.now().isoformat(), 'prompt': valid_req.prompt, 'choices': response['choices']}))
+            query_log_fh.write(json.dumps({
+                'timestamp': datetime.now().isoformat(),
+                'model': TUNED_MODEL_ID,
+                'prompt': valid_req.prompt,
+                'choices': response['choices']
+            }))
             query_log_fh.write("\n")
             query_log_fh.flush()
             return response['choices']
