@@ -9,7 +9,7 @@ from flask import send_file
 from flask_cors import CORS, cross_origin
 
 LOGS_SECRET = os.environ.get('LOGS_SECRET', 'anotherone')
-TUNED_MODEL_ID = os.environ.get('TUNED_MODEL_ID', 'davinci:ft-personal-2022-12-29-11-47-17')
+TUNED_MODEL_ID = os.environ.get('TUNED_MODEL_ID', 'davinci:ft-personal-2022-12-29-14-46-52')
 QUERY_LOG_PATH = os.environ.get('QUERY_LOG_PATH', '/tmp/newyear.queries.jsonl')
 
 START = "Дополни это поздравление с новым годом неожиданным прикольным добрым и позитивным образом: "
